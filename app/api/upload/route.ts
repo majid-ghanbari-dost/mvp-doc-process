@@ -1,26 +1,31 @@
 import { NextResponse } from 'next/server';
+import { put } from '@vercel/blob';
 
-// NOTE: This route only reads the file and returns its meta info.
-// It doesn't persist the file because Vercel serverless functions have ephemeral storage.
-// For real storage, connect to S3, Supabase Storage, or Vercel Blob.
-export const runtime = 'nodejs'; // ensure running in Node.js environment
+export const runtime = 'nodejs'; // اجرای Node.js در Vercel
 
 export async function POST(req: Request) {
   try {
     const form = await req.formData();
     const file = form.get('file');
+
     if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: 'هیچ فایلی دریافت نشد.' }, { status: 400 });
     }
-    const arrayBuffer = await file.arrayBuffer();
-    const size = arrayBuffer.byteLength;
+
+    // نام امن و یکتا
+    const safeName = String(file.name).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const key = `uploads/${Date.now()}-${safeName}`;
+
+    // ذخیره در Vercel Blob با دسترسی عمومی
+    const saved = await put(key, file, { access: 'public' });
 
     return NextResponse.json({
       name: file.name,
-      size,
-      type: file.type || ''
+      size: file.size,
+      type: file.type || '',
+      url: saved.url,     // لینک فایل
     });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Upload failed' }, { status: 500 });
+    return NextResponse.json({ error: e?.message || 'آپلود ناموفق بود.' }, { status: 500 });
   }
 }
