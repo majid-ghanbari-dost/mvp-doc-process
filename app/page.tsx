@@ -23,7 +23,6 @@ export default function Page() {
         method: "POST",
         body: formData,
       });
-
       const data = await res.json();
       setResult(data);
     } catch (err) {
@@ -35,8 +34,9 @@ export default function Page() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-6 gap-4">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 gap-4">
       <h1 className="text-2xl font-bold">آپلود فایل</h1>
+
       <input type="file" onChange={handleFileChange} />
       <button
         onClick={handleUpload}
@@ -59,6 +59,6 @@ export default function Page() {
           )}
         </div>
       )}
-    </main>
+    </div>
   );
 }
