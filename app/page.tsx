@@ -2,11 +2,10 @@
 
 import { useRef, useState } from 'react';
 
-type UploadResult = {
-  name: string;
-  size: number;
-  type: string;
-} | { error: string };
+type UploadResult =
+  | { name: string; size: number; type: string; url?: string }
+  | { error: string };
+
 
 export default function Page() {
   const inputRef = useRef<HTMLInputElement | null>(null);
